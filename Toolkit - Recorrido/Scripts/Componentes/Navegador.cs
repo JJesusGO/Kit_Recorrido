@@ -32,11 +32,11 @@ namespace Recorrido{
         [SerializeField]
         private bool enablerotacion = true;
         [SerializeField]
-        private float rotacionminima = 0.25f;
+        private float rotacionminima = 40.0f;
         [SerializeField]
-        private float rotacionmaxima = 1.25f;
+        private float rotacionmaxima = 100.0f;
         [SerializeField]
-        private float rotacionaceleracion = 0.75f;
+        private float rotacionaceleracion = 10.0f;
         [Header("Vista")]
         [SerializeField]
         private string[] layervista;
@@ -45,11 +45,11 @@ namespace Recorrido{
         [SerializeField]
         private float vistamaxima = 70.0f;
         [SerializeField]
-        private float vistarotacionminima = 0.25f;
+        private float vistarotacionminima = 40.0f;
         [SerializeField]
-        private float vistarotacionmaxima = 1.25f;
+        private float vistarotacionmaxima = 100.0f;
         [SerializeField]
-        private float vistarotacionaceleracion = 0.75f;
+        private float vistarotacionaceleracion = 10.0f;
 
         private const float checktiempo = 0.2f;
         private Vector2 inicio,fin,actual;
@@ -84,8 +84,7 @@ namespace Recorrido{
             UpdateVista();
 
             UpdatePosicion();
-                                 
-            
+                                             
         }
         public override void Generacion(){
 
@@ -147,7 +146,7 @@ namespace Recorrido{
         private void UpdateVista()
         {
 
-            vista += direccion.y * vistarotacionaceleracion * Time.deltaTime;
+            vista += direccion.y * vistarotacionaceleracion;
 
             if (vista != 0.0f)
             {
@@ -157,7 +156,7 @@ namespace Recorrido{
                     vista = vista / Mathf.Abs(vista) * vistarotacionmaxima;
             }
 
-            camara.Rotate(new Vector3(-vista, 0, 0));
+            camara.Rotate(new Vector3(-vista, 0, 0) * Time.deltaTime);
             float vistax = camara.localRotation.eulerAngles.x;
             if (vistax >= 90.0f)
                 vistax = -(360.0f - vistax);
@@ -167,7 +166,7 @@ namespace Recorrido{
         private void UpdateGirar()
         {
 
-            rotacion += direccion.x * rotacionaceleracion * Time.deltaTime;
+            rotacion += direccion.x * rotacionaceleracion;
 
             if (rotacion != 0.0f)
             {
@@ -177,7 +176,7 @@ namespace Recorrido{
                     rotacion = rotacion / Mathf.Abs(rotacion) * rotacionmaxima;
             }
 
-            transform.Rotate(new Vector3(0.0f, rotacion, 0.0f));
+            transform.Rotate(new Vector3(0.0f, rotacion * Time.deltaTime, 0.0f));
 
         }
         private void UpdatePosicion()
@@ -238,7 +237,7 @@ namespace Recorrido{
         {
             if (!enablemovimiento)
                 return;
-            posiciontarget = new Vector3(posicion.x, transform.position.y, posicion.z);
+            posiciontarget = new Vector3(posicion.x, posicion.y, posicion.z);
             camara.localPosition = posicioninicial;
         }
         private void Mirar(Vector3 posicion)
@@ -276,11 +275,41 @@ namespace Recorrido{
         public void AccionResetMirada() {
             ResetMirada();
         }
-        public void AccionPosicionar(Vector3 posicionar) {
-            Posicionar(posicionar);
+        public void AccionPosicionar(Transform transform) {
+            Posicionar(transform.position);
+        }
+        public void AccionPosicionar(string comando)
+        {
+            string[] data = comando.Split('_');
+            Vector3 posicion = Vector3.zero;
+            if (data != null)
+                if (data.Length == 3)
+                    posicion = new Vector3(float.Parse(data[0]), float.Parse(data[1]), float.Parse(data[2]));
+            Posicionar(posicion);
         }
         public void AccionGirar(float rotacion){
             ModGiro(rotacion);
+        }
+        public void AccionMovimientoRelativo(string comando) {
+
+            string[] data = comando.Split('_');
+            Vector3 mod = Vector3.zero;
+            if (data != null)
+                if (data.Length == 3)
+                    mod = new Vector3(float.Parse(data[0]), float.Parse(data[1]), float.Parse(data[2]));
+
+            Vector3 modrelativo = transform.right*mod.x + transform.forward*mod.z + transform.up*mod.y;
+            Posicionar(GetPosicion() + modrelativo);            
+        }
+        public void AccionMovimiento(string comando){
+
+            string[] data = comando.Split('_');
+            Vector3 mod = Vector3.zero;
+            if (data != null)
+                if (data.Length == 3)
+                    mod = new Vector3(float.Parse(data[0]), float.Parse(data[1]), float.Parse(data[2]));
+
+            Posicionar(GetPosicion() + mod);
         }
 
         public void AccionSetEnableClick(bool enable) {

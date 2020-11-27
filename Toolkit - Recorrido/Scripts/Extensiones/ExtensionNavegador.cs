@@ -40,11 +40,17 @@ namespace Recorrido
                 return;
             navegador.AccionResetMirada();
         }
-        public void AccionPosicionar(Vector3 posicionar)
+        public void AccionPosicionar(Transform posicionar)
         {
             if (navegador == null)
                 return;
             navegador.AccionPosicionar(posicionar);
+        }
+        public void AccionPosicionar(string comando)
+        {
+            if (navegador == null)
+                return;
+            navegador.AccionPosicionar(comando);
         }
         public void AccionGirar(float rotacion)
         {
@@ -88,6 +94,19 @@ namespace Recorrido
             if (navegador == null)
                 return;
             navegador.AccionToggleRotacion();
+        }
+
+        public void AccionMovimientoRelativo(string codigo)
+        {
+            if (navegador == null)
+                return;
+            navegador.AccionMovimientoRelativo(codigo);
+        }
+        public void AccionMovimiento(string codigo)
+        {
+            if (navegador == null)
+                return;
+            navegador.AccionMovimiento(codigo);
         }
 
 
