@@ -4,6 +4,10 @@
 
 # Descargas
 
+- [ToolKit Recorrido 1.1f0](https://raw.githubusercontent.com/TheReaperScythe/Kit_Recorrido/main/Versiones/ToolKit_Recorrido_1_1f0.unitypackage)
+
+* Se agrego un evento en Navegador, que tiene el fin de emitir señales emulando un ritmo de pasos definido.
+
 - [ToolKit Recorrido 1.0f0](https://raw.githubusercontent.com/TheReaperScythe/Kit_Recorrido/main/Versiones/ToolKit_Recorrido_1_0f0.unitypackage)
 
 # Retroalimentacion/Reporte de Bugs
