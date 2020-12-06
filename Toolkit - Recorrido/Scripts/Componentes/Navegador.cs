@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 
 namespace Recorrido{
-    public class Navegador : Entidad{
+    public class Navegador : Entidad {
 
 
         [Header("General")]
@@ -25,7 +26,7 @@ namespace Recorrido{
         [SerializeField]
         private bool enablemovimiento = true;
         [SerializeField]
-        private string []layermovimiento;
+        private string[] layermovimiento;
         [SerializeField]
         private float movimientovelocidad = 7.5f;
         [Header("Rotacion")]
@@ -50,6 +51,11 @@ namespace Recorrido{
         private float vistarotacionmaxima = 100.0f;
         [SerializeField]
         private float vistarotacionaceleracion = 10.0f;
+        [Header("Pasos")]
+        [SerializeField]
+        private float tiempopasos = 0.6f;
+        [SerializeField]
+        private UnityEvent eventopasos = new UnityEvent();
 
         private const float checktiempo = 0.2f;
         private Vector2 inicio,fin,actual;
@@ -64,9 +70,12 @@ namespace Recorrido{
         private Vector2 direccion = Vector2.zero;
         private Vector3 posiciontarget = Vector2.zero,
                         posicioninicial = Vector2.zero;
+        private Temporizador temporizadorpasos;
 
         protected override void Awake(){
             base.Awake();
+            temporizadorpasos = new Temporizador(tiempopasos);
+            temporizadorpasos.Start();
         }
         protected override void Start(){
             base.Start();
@@ -76,6 +85,8 @@ namespace Recorrido{
 
         protected override void Update(){
             base.Update();
+
+            temporizadorpasos.Update();
 
             UpdateGestos();
 
@@ -181,6 +192,15 @@ namespace Recorrido{
         }
         private void UpdatePosicion()
         {
+
+            if (transform.position != posiciontarget && enablemovimiento) {
+                if (temporizadorpasos.IsActivo()) {
+                    eventopasos.Invoke();
+                    temporizadorpasos.SetTiempoTarget(tiempopasos);
+                    temporizadorpasos.Start();
+                }
+            }
+
             camara.localPosition = posicioninicial;
             transform.position = Vector3.MoveTowards(transform.position, posiciontarget, movimientovelocidad * Time.deltaTime);
         }
